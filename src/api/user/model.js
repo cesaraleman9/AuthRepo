@@ -1,19 +1,51 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
+const bcrypt = require("bcrypt");
 
 // >> Here will be the User schema.
-const UserSchema;
+const UserSchema = new Schema({
+  username: {
+    type: String,
+    require: true,
+  },
+  password: {
+    type: String,
+    require: true,
+  },
+  firstname: {
+    type: String,
+    require: true,
+  },
+  lastname: {
+    type: String,
+    require: true,
+  },
+  email: {
+    type: String,
+    require: true,
+  },
+});
 
 // >> Here will be the pre methods for the schema.
-UserSchema.pre('', () => {});
+UserSchema.pre("save", function (next) {
+  const hash = bcrypt.hashSync(this.password, 12);
+  this.password = hash;
+  next();
+});
 
 // >> Here will be the User methods for the schema.
-UserSchema.methods = {};
+UserSchema.methods = {
+  validatePassword(password) {
+    return bcrypt.compareSync(password, this.password);
+  },
+};
 
 // >> Here will be the User model using the User schema.
-const UserModel;
+
+// module.exports = User = mongoose.model("User", UserSchema);
+const UserModel = mongoose.model("User", UserSchema);
 
 module.exports = {
   schema: UserSchema,
   model: UserModel,
-}
+};
